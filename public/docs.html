@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cric Journal API &amp; MCP</title>
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    body { padding-bottom: 0; }
+    pre { background: var(--chip); padding: 12px; border-radius: 10px; overflow-x: auto; font-size: 12.5px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .ep { display: flex; gap: 10px; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+    .ep:last-child { border-bottom: 0; }
+    .verb { font-weight: 800; font-size: 11px; color: #fff; background: var(--brand); padding: 2px 6px; border-radius: 4px; }
+    .ep code { font-weight: 600; word-break: break-all; }
+    .ep .params { width: 100%; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="topbar-inner"><a class="logo" href="/"><span>Cric Journal</span></a><span style="margin-left:auto;opacity:.85">Developers</span></div></header>
+  <main>
+    <h1>API &amp; MCP for developers and AI agents</h1>
+    <p class="muted">Everything the website shows is available through a public REST API (JSON, OpenAPI 3.1), live Server-Sent Event streams, and a Model Context Protocol server for AI assistants.</p>
+
+    <h2>REST API</h2>
+    <div class="card">
+      <p>Base URL: <code id="base"></code> · Spec: <a href="/api/openapi.json" style="color:var(--brand);font-weight:600">/api/openapi.json</a></p>
+      <pre><code id="curl"></code></pre>
+      <p class="small muted">Optional header <code>x-api-key</code> raises your rate limit. Responses include <code>RateLimit-*</code> headers.</p>
+    </div>
+    <div class="card flush" id="endpoints" style="margin-top:12px"></div>
+
+    <h2>Live updates (SSE)</h2>
+    <div class="card"><pre><code>const es = new EventSource('/api/v1/matches/{matchId}/stream');
+es.addEventListener('ball', (e) =&gt; console.log(JSON.parse(e.data)));
+// events: toss, ball, innings_end, match_end   ·   all matches: /api/v1/stream</code></pre></div>
+
+    <h2>MCP server</h2>
+    <div class="card">
+      <p>Streamable HTTP endpoint: <code id="mcp"></code> (stateless, JSON-RPC over POST).</p>
+      <p><b>Tools:</b> <span id="tools" class="muted">list_matches, get_match, get_scorecard, get_commentary, get_squads, list_series, get_series, list_teams, get_team, find_players, get_player, get_rankings, list_news, search</span></p>
+      <p><b>Resources:</b> <code>cricket://matches/live</code>, <code>cricket://matches/{matchId}</code> · <b>Prompts:</b> <code>match_summary</code></p>
+      <p class="small muted">Claude Code:</p>
+      <pre><code id="cc"></code></pre>
+      <p class="small muted">Desktop clients (stdio), e.g. <code>claude_desktop_config.json</code>:</p>
+      <pre><code>{
+  "mcpServers": {
+    "cric-journal": { "command": "node", "args": ["/path/to/cric_journal/dist/mcp/stdio.js"] }
+  }
+}</code></pre>
+    </div>
+  </main>
+  <script type="module">
+    const origin = location.origin;
+    document.getElementById('base').textContent = origin + '/api/v1';
+    document.getElementById('mcp').textContent = origin + '/mcp';
+    document.getElementById('curl').textContent = `curl ${origin}/api/v1/matches?status=live`;
+    document.getElementById('cc').textContent = `claude mcp add --transport http cric-journal ${origin}/mcp`;
+    const spec = await fetch('/api/openapi.json').then((r) => r.json());
+    const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    document.getElementById('endpoints').innerHTML = Object.entries(spec.paths).map(([path, ops]) => {
+      const op = ops.get;
+      const qs = (op.parameters || []).filter((p) => p.in === 'query').map((p) => `${p.name}${p.schema?.enum ? ' (' + p.schema.enum.join('|') + ')' : ''}`);
+      return `<div class="ep"><span class="verb">GET</span><code>/api/v1${esc(path)}</code><span class="muted">${esc(op.summary)}</span>${qs.length ? `<div class="params">query: ${esc(qs.join(', '))}</div>` : ''}</div>`;
+    }).join('');
+  </script>
+</body>
+</html>

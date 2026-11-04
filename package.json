@@ -1,0 +1,50 @@
+{
+  "name": "cric-journal",
+  "version": "1.0.0",
+  "description": "Cric Journal – live cricket scores, scorecards & commentary. Mobile-first PWA + REST API + MCP server.",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p .",
+    "start": "node dist/index.js",
+    "mcp:stdio": "node dist/mcp/stdio.js",
+    "mcp:stdio:dev": "tsx src/mcp/stdio.ts",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "node --import tsx --test test/*.test.ts",
+    "test:e2e": "node scripts/e2e-mobile.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avilashs/cric_journal.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avilashs/cric_journal/issues"
+  },
+  "homepage": "https://github.com/avilashs/cric_journal#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "cors": "^2.8.6",
+    "express": "^4.22.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.25",
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "cricket",
+    "live-scores",
+    "mcp",
+    "api",
+    "pwa"
+  ]
+}

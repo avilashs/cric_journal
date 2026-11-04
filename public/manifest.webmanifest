@@ -1,0 +1,21 @@
+{
+  "name": "Cric Journal – Live Cricket Scores",
+  "short_name": "Cric Journal",
+  "description": "Live cricket scores, ball-by-ball commentary, scorecards, series, rankings and news.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b7a5a",
+  "theme_color": "#0b7a5a",
+  "categories": ["sports", "news"],
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Live matches", "url": "/matches?tab=live" },
+    { "name": "Rankings", "url": "/rankings" }
+  ]
+}

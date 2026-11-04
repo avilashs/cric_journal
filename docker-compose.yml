@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      LIVE_TICK_MS: 4000
+      DATA_FILE: /data/cric.json
+      # API_KEYS: key1,key2
+      # MCP_TOKEN: change-me
+    volumes:
+      - cric-data:/data
+    restart: unless-stopped
+volumes:
+  cric-data:

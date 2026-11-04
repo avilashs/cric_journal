@@ -1,0 +1,29 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Mobile end-to-end (Playwright)
+        run: |
+          npm i --no-save playwright@1
+          npx playwright install --with-deps chromium
+          LIVE_TICK_MS=1500 node dist/index.js &
+          npx wait-on -t 30000 http://localhost:3000/api/v1/health
+          BASE_URL=http://localhost:3000 npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: screenshots/
